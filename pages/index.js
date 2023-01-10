@@ -2,7 +2,6 @@ import Head from 'next/head'
 // import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import Blog from '../components/Blog'
-
 import Header from '../components/Header'
 
 const URL = process.env.STRAPI_BASE_URL

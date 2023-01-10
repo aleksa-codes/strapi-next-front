@@ -181,6 +181,8 @@
     margin-bottom: 120px;
     max-width: 320px;
     text-align: center;
+    margin: 0 auto;
+    gap: 1rem;
   }
 
   .card {

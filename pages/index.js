@@ -1,12 +1,9 @@
 import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from '@next/font/google'
+// import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import Blog from '../components/Blog'
 
 import Header from '../components/Header'
-
-const inter = Inter({ subsets: ['latin'] })
 
 const URL = process.env.STRAPI_BASE_URL
 

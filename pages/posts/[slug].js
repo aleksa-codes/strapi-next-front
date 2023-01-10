@@ -1,5 +1,5 @@
 const URL = process.env.STRAPI_BASE_URL
-import Image from 'next/image'
+// import Image from 'next/image'
 import Header from '../../components/Header'
 import styles from '../../styles/Home.module.css'
 import { Inter } from '@next/font/google'

@@ -72,6 +72,11 @@ export async function getStaticProps({ params }) {
   }
 
   const res = await fetch(`${URL}/graphql`, fetchParams)
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch post, received status ${res.status}`)
+  }
+
   const posts = await res.json()
   const post = posts.data.blogposts.data[0].attributes
 

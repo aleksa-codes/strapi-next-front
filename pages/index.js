@@ -35,22 +35,31 @@ export async function getStaticProps(context) {
     })
   }
 
-  const res = await fetch(`${URL}/graphql`, fetchParams)
+  try {
+    const res = await fetch(`${URL}/graphql`, fetchParams)
+    if (!res.ok) throw new Error(`Failed to fetch posts, received status ${res.status}`)
 
-  if (!res.ok) {
-    throw new Error(`Failed to fetch posts, received status ${res.status}`)
-  }
+    const { data } = await res.json()
 
-  const { data } = await res.json()
-  const { blogposts } = data
+    if (!data || !data.blogposts) {
+      throw new Error('Error Occured while fetching data')
+    }
+    const { blogposts } = data
 
-  return {
-    props: blogposts,
-    revalidate: 10
+    return {
+      props: { blogposts },
+      revalidate: 10
+    }
+  } catch (error) {
+    return {
+      props: {
+        error: error.message
+      }
+    }
   }
 }
 
-export default function Home({ data }) {
+export default function Home({ data, error }) {
   return (
     <>
       <Head>
@@ -69,14 +78,22 @@ export default function Home({ data }) {
         </div> */}
 
         <div className={styles.grid}>
-          {data.map((post, i) => (
-            <Blog
-              key={i}
-              slug={post.attributes.slug}
-              title={post.attributes.title}
-              description={post.attributes.description}
-            ></Blog>
-          ))}
+          {!error ? (
+            data && data.length > 0 ? (
+              data.map((post, i) => (
+                <Blog
+                  key={i}
+                  slug={post.attributes.slug}
+                  title={post.attributes.title}
+                  description={post.attributes.description}
+                ></Blog>
+              ))
+            ) : (
+              <div>Loading...</div>
+            )
+          ) : (
+            <div>{error}</div>
+          )}
         </div>
       </main>
     </>

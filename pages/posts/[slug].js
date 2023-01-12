@@ -71,29 +71,43 @@ export async function getStaticProps({ params }) {
     })
   }
 
-  const res = await fetch(`${URL}/graphql`, fetchParams)
+  try {
+    const res = await fetch(`${URL}/graphql`, fetchParams)
+    if (!res.ok) throw new Error(`Failed to fetch post, received status ${res.status}`)
 
-  if (!res.ok) {
-    throw new Error(`Failed to fetch post, received status ${res.status}`)
-  }
+    const posts = await res.json()
 
-  const posts = await res.json()
-  const post = posts.data.blogposts.data[0].attributes
+    if (!posts.data || !posts.data.blogposts) {
+      throw new Error('Error Occured while fetching data')
+    }
+    const post = posts.data.blogposts.data[0].attributes
 
-  return {
-    props: post,
-    revalidate: 10
+    return {
+      props: { post },
+      revalidate: 10
+    }
+  } catch (error) {
+    return {
+      props: {
+        error: error.message
+      }
+    }
   }
 }
 
-const Post = ({ title, blogbody, splash }) => {
+const Post = ({ post, error }) => {
   return (
     <main className={styles.main}>
       <Header></Header>
-      <h1 className={inter.className}>{title}</h1>
-      <hr style={{ width: '100%', margin: '16px auto' }} />
-      <ReactMarkdown className={inter.className}>{blogbody}</ReactMarkdown>
-      {/* <Image src={splash.data.attributes.url} alt={title} width={400} height={400} /> */}
+      {!error ? (
+        <>
+          <h1 className={inter.className}>{post.title}</h1>
+          <hr style={{ width: '100%', margin: '16px auto' }} />
+          <ReactMarkdown className={inter.className}>{post.blogbody}</ReactMarkdown>
+        </>
+      ) : (
+        <div>{error}</div>
+      )}
     </main>
   )
 }

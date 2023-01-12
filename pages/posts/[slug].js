@@ -7,36 +7,48 @@ import ReactMarkdown from 'react-markdown'
 const inter = Inter({ subsets: ['latin'] })
 
 export async function getStaticPaths() {
-  const fetchParams = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      query: `{
-                blogposts{
-                    data{
-                      attributes{
-                        title
-                        blogbody
-                        description
-                        slug
+  try {
+    const fetchParams = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        query: `{
+                  blogposts{
+                      data{
+                        attributes{
+                          title
+                          blogbody
+                          description
+                          slug
+                        }
                       }
-                    }
-                }
-    }`
-    })
-  }
+                  }
+      }`
+      })
+    }
+    const res = await fetch(`${URL}/graphql`, fetchParams)
+    if (!res.ok) throw new Error(`Failed to fetch post, received status ${res.status}`)
 
-  const res = await fetch(`${URL}/graphql`, fetchParams)
-  const posts = await res.json()
-  const paths = posts.data.blogposts.data.map((post) => ({
-    params: { slug: post.attributes.slug }
-  }))
+    const posts = await res.json()
 
-  return {
-    paths: paths,
-    fallback: 'blocking'
+    if (!posts.data || !posts.data.blogposts) {
+      throw new Error('Error Occured while fetching data')
+    }
+    const paths = posts.data.blogposts.data.map((post) => ({
+      params: { slug: post.attributes.slug }
+    }))
+    return {
+      paths: paths,
+      fallback: 'blocking'
+    }
+  } catch (error) {
+    console.error(error)
+    return {
+      paths: [],
+      fallback: false
+    }
   }
 }
 
@@ -82,7 +94,7 @@ export async function getStaticProps({ params }) {
     const post = posts.data.blogposts.data[0].attributes
 
     return {
-      props: { post },
+      props: post ? { post } : { post: {} },
       revalidate: 10
     }
   } catch (error) {
@@ -98,14 +110,14 @@ const Post = ({ post, error }) => {
   return (
     <main className={styles.main}>
       <Header></Header>
-      {!error ? (
+      {!error && post ? (
         <>
           <h1 className={inter.className}>{post.title}</h1>
           <hr style={{ width: '100%', margin: '16px auto' }} />
           <ReactMarkdown className={inter.className}>{post.blogbody}</ReactMarkdown>
         </>
       ) : (
-        <div>{error}</div>
+        <div>{error ? 'Post not found' : 'Loading...'}</div>
       )}
     </main>
   )

@@ -46,7 +46,7 @@ export async function getStaticProps() {
     const { blogposts } = data
 
     return {
-      props: blogposts ? { data: blogposts.data } : { data: [] },
+      props: blogposts ? { data: blogposts.data } : { data: {} },
       revalidate: 10
     }
   } catch (error) {

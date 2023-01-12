@@ -1,12 +1,11 @@
 import Head from 'next/head'
-// import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import Blog from '../components/Blog'
 import Header from '../components/Header'
 
 const URL = process.env.STRAPI_BASE_URL
 
-export async function getStaticProps(context) {
+export async function getStaticProps() {
   const fetchParams = {
     method: 'POST',
     headers: {
@@ -70,13 +69,6 @@ export default function Home({ data, error }) {
       </Head>
       <main className={styles.main}>
         <Header></Header>
-        {/* <div className={styles.center}>
-          <Image className={styles.logo} src='/next.svg' alt='Next.js Logo' width={180} height={37} priority />
-          <div className={styles.thirteen}>
-            <Image src='/thirteen.svg' alt='13' width={40} height={31} priority />
-          </div>
-        </div> */}
-
         <div className={styles.grid}>
           {!error ? (
             data && data.length > 0 ? (

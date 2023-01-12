@@ -46,7 +46,7 @@ export async function getStaticProps() {
     const { blogposts } = data
 
     return {
-      props: { blogposts },
+      props: blogposts ? { data: blogposts.data } : { data: [] },
       revalidate: 10
     }
   } catch (error) {
@@ -81,7 +81,7 @@ export default function Home({ data, error }) {
                 ></Blog>
               ))
             ) : (
-              <div>Loading...</div>
+              <div>No posts</div>
             )
           ) : (
             <div>{error}</div>
